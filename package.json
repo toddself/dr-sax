@@ -1,5 +1,5 @@
 {
-  "name": "html2markdown",
+  "name": "dr-sax",
   "version": "0.0.0",
   "description": "An html to markdown converter for node that doesn't use jsdom",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/toddself/html2markdown"
+    "url": "git://github.com/toddself/dr-sax"
   },
   "keywords": [
     "markdown",
@@ -20,9 +20,9 @@
   "author": "Todd Kennedy",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/toddself/html2markdown/issues"
+    "url": "https://github.com/toddself/dr-sax/issues"
   },
-  "homepage": "https://github.com/toddself/html2markdown",
+  "homepage": "https://github.com/toddself/dr-sax",
   "dependencies": {
     "htmlparser2": "^3.7.1"
   },
