@@ -17,9 +17,10 @@ There are a few node.js based html to markdown converters available, why do we n
 ## Usage
 
 ```javascript
-> drsax = require('dr-sax');
-> drsax('<p>Wow, this is an <b>awesome</b> HTML parser dude! You should <a href="http://yahoo.com">submit it to yahoo!</a>');
-Wow, this is an **awesome** HTML parser dude! You should [submit it to yahoo!](http://yahoo.com)
+> var DrSax = require('dr-sax');
+> var drsax = new DrSax();
+> drsax.write('<p>Wow, this is an <b>awesome</b> HTML parser dude! You should <a href="http://yahoo.com">submit it to yahoo!</a>');
+"Wow, this is an **awesome** HTML parser dude! You should [submit it to yahoo!](http://yahoo.com)"
 ```
 
 ## Testing

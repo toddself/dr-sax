@@ -1,202 +1,182 @@
 'use strict';
 
 var htmlparser2 = require('htmlparser2');
+var tagTable = require('./dialect');
 
-var stack = [];
-var splicePos = 0;
-var needSplice = false;
-var listStack = [];
-var trimNL = false;
-var inPre = false;
-var ignoreClose = false;
+/**
+ * Get the last element of an array
+ * @method  last
+ * @private
+ * @param   {array} arr Array to slice and dice
+ * @returns {mixed} last element of the array
+ */
+function last(arr){
+  return arr.slice(-1)[0];
+}
 
-var tagTable = {
-  b: {
-    open: '**',
-    close: '**'
-  },
-  i: {
-    open: '*',
-    close: '*'
-  },
-  img: {
-    open: '!',
-    close: '',
-    attrs: {
-      alt: {
-        open: '[',
-        close: ']'
-      },
-      src: {
-        open: '(',
-        close: ')'
-      }
-    }
-  },
-  a: {
-    open: '',
-    close: '',
-    attrs: {
-      text: {
-        open: '[',
-        close: ']'
-      },
-      href: {
-        open: '(',
-        close: ')'
-      }
-    }
-  },
-  blockquote: {
-    open: '\n\n> ',
-    close: '\n\n'
-  },
-  code: {
-    open: '\n\n```\n',
-    close: '\n```\n\n'
-  },
-  pre: {
-    open: '`',
-    close: '`'
-  },
-  p: {
-    open: '',
-    close: '\n\n'
-  },
-  ol: {
-    open: '\n\n',
-    close: '\n\n'
-  },
-  ul: {
-    open: '\n\n',
-    close: '\n\n'
-  },
-  olli: {
-    open: '1.',
-    close: '\n'
-  },
-  ulli: {
-    open: '*',
-    close: '\n'
-  },
-  hr: {
-    open: '\n\n- - -\n\n',
-    close: ''
-  },
-  h1: {
-    open: '# ',
-    close: '\n\n'
-  },
-  h2: {
-    open: '## ',
-    close: '\n\n'
-  },
-  h3: {
-    open: '### ',
-    close: '\n\n'
-  },
-  h4: {
-    open: '#### ',
-    close: '\n\n'
-  },
-  h5: {
-    open: '##### ',
-    close: '\n\n'
-  },
-  h6: {
-    open: '###### ',
-    close: '\n\n'
-  }
+/**
+ * Return a string with the input repeated itr number of times
+ * @method  repeat
+ * @private
+ * @param   {string} chr the string to repeat
+ * @param   {number} itr the number of times to repeat it
+ * @returns {string} the string repeated itr times
+ */
+function repeat(chr, itr){
+  return new Array(itr+1).join(chr);
+}
+
+/**
+ * DrSax is a SAX based HTML to Markdown converter.
+ * @namespace DrSax
+ * @method DrSax
+ */
+function DrSax(){
+  this.parser = new htmlparser2.Parser({
+    onopentag: this.onopentag.bind(this),
+    ontext: this.ontext.bind(this),
+    onclosetag: this.onclosetag.bind(this)
+  });
+  this.stack = [];
+  this.splicePos = 0;
+  this.needSplice = false;
+  this.listStack = [];
+  this.trimNL = false;
+  this.tagStack = [];
+  this.ignoreClose = false;
+  this.indentStack = 0;
+}
+
+/**
+ * Write a string of HTML to the converter and receive a string of markdown back
+ * @memberOf DrSax
+ * @method  write
+ * @param   {string} html A string containing HTML
+ * @returns {string} Markdown!
+ */
+DrSax.prototype.write = function(html){
+  this.parser.write(html);
+  this.parser.end();
+  var markdown = this.stack.join('');
+  this.stack.length = 0; // clear the stack incase we use this again
+  return markdown;
 };
 
-
-function onopentag(name, attrs){
-  if(name === 'ol' || name === 'ul'){
-    listStack.push(name);
-  }
-
-  if(name === 'pre'){
-    inPre = true;
-  }
-
-  if(name === 'code' && inPre){
-    stack.pop();
-  }
-
+/**
+ * What to do when you encounter an open tag
+ * @memberOf DrSax
+ * @method  onopentag
+ * @param   {string} name The name of the tag
+ * @param   {object} attrs An object with all the attrs in key/val pairs
+ * @returns {object} undefined
+ */
+DrSax.prototype.onopentag = function(name, attrs){
+  // we want to trim <li> elements so they don't generate multiple lists
+  // also here we will determine what actual markdown token to insert
+  // based on the parent element for the <li> that we captured above
   if(name === 'li'){
-    trimNL = true;
-    name = listStack.slice(-1)[0]+'li';
+    this.trimNL = true;
+    name = last(this.listStack)+'li';
   }
 
   var tag = tagTable[name];
   if(tag){
-    stack.push(tag.open);
+    this.tagStack.push(name);
+    // The wrapper tags for lists don't actually generate markdown,
+    // but they influence the markdown that we're generating for their
+    // child <li> members, so we need to know what is the parent tag for
+    // our li
+    if(name === 'ol' || name === 'ul'){
+      this.listStack.push(name);
+    }
+
+    // since both <code> and <pre> can wrap each other for code blocks
+    // we want to make sure we're getting rid of the <pre> tag that
+    // was recorded
+    if(name === 'code' && last(this.tagStack) === 'pre'){
+      this.ignoreClose = true;
+      this.stack.pop();
+    }
+
+    // if we are in a tag that allows tags "inside" of it, we need to maintain
+    // the proper amount of indentation
+    this.stack.push(repeat('\t', this.indentStack));
+    if(tag.indent){
+      ++this.indentStack;
+    }
+
+    this.stack.push(tag.open);
     if(tag.attrs){
-      Object.keys(tag.attrs).forEach(function(key){
+      var keys = Object.keys(tag.attrs);
+      var len = keys.length;
+      for(var i = 0; i < len; i++){
+        var key = keys[i];
+        this.stack.push(tag.attrs[key].open);
+        // if we need to get the tags containing text in here, we have to handle
+        // it specially and splice it into an earlier position in the stack
+        // since we don't have access to the text right now
         if(key === 'text'){
-          stack.push(tag.attrs[key].open);
-          splicePos = stack.length;
-          needSplice = true;
-          stack.push(tag.attrs[key].close);
+          this.splicePos = this.stack.length;
+          this.needSplice = true;
+        // check to make sure the markdown token needs this particular attribute
         } else if (Object.keys(attrs).indexOf(key) !== -1){
-          stack.push(tag.attrs[key].open);
-          stack.push(attrs[key]);
-          stack.push(tag.attrs[key].close);
+          this.stack.push(attrs[key]);
         }
-      });
+        this.stack.push(tag.attrs[key].close);
+      }
     }
   }
-}
+};
 
-function ontext(text){
-  if(needSplice){
-    stack.splice(splicePos, 0, text);
-    needSplice = false;
+/**
+ * We have some straight up plain text. We might have to push it into the stack
+ * at a higher position though...
+ * @memberOf DrSax
+ * @method  ontext
+ * @param   {string} text Text nodes
+ * @returns {object} undefined
+ */
+DrSax.prototype.ontext = function(text){
+  if(this.needSplice){
+    this.stack.splice(this.splicePos, 0, text);
+    this.needSplice = false;
   } else {
-    if(trimNL){
+    if(this.trimNL){
       text = text.trim();
     }
-    stack.push(text);
+    this.stack.push(text);
   }
-}
+};
 
-function onclosetag(name){
+/**
+ * We've reached the end of our tag, so clear all state flags, pop off the stack,
+ * etc
+ * @memberOf DrSax
+ * @method  onclosetag
+ * @param   {string} name name of the tag that is closing
+ * @returns {object} undefined
+ */
+DrSax.prototype.onclosetag = function(name){
   if(name === 'ol' || name === 'ul'){
-    listStack.pop();
+    this.listStack.pop();
   }
 
   if(name === 'li'){
-    trimNL = false;
-    name = listStack.slice(-1)[0]+'li';
-  }
-
-  if(name === 'pre'){
-    inPre = false;
-  }
-
-  if(name === 'code' && inPre){
-    ignoreClose = true;
+    this.trimNL = false;
+    name = last(this.listStack)+'li';
   }
 
   var tag = tagTable[name];
-  if(tag && !ignoreClose){
-    stack.push(tag.close);
+  if(tag && !this.ignoreClose){
+    this.stack.push(tag.close);
   }
 
-  if(ignoreClose){
-    ignoreClose = false;
+  if(this.ignoreClose){
+    this.ignoreClose = false;
   }
-}
-
-module.exports = function(html){
-  var parser = new htmlparser2.Parser({
-    onopentag: onopentag,
-    ontext: ontext,
-    onclosetag: onclosetag
-  });
-  parser.write(html);
-  parser.end();
-  var markdown = stack.join('');
-  stack.length = 0;
-  return markdown;
+  if(tag.indent){
+    --this.indentStack;
+  }
 };
+
+module.exports = DrSax;
