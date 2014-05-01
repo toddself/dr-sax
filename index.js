@@ -6,6 +6,9 @@ var stack = [];
 var splicePos = 0;
 var needSplice = false;
 var listStack = [];
+var trimNL = false;
+var inPre = false;
+var ignoreClose = false;
 
 var tagTable = {
   b: {
@@ -46,11 +49,11 @@ var tagTable = {
   },
   blockquote: {
     open: '\n\n> ',
-    close: ''
+    close: '\n\n'
   },
   code: {
     open: '\n\n```\n',
-    close: '```\n\n'
+    close: '\n```\n\n'
   },
   pre: {
     open: '`',
@@ -69,11 +72,11 @@ var tagTable = {
     close: '\n\n'
   },
   olli: {
-    open: '1. ',
+    open: '1.',
     close: '\n'
   },
   ulli: {
-    open: '* ',
+    open: '*',
     close: '\n'
   }
 };
@@ -84,7 +87,16 @@ function onopentag(name, attrs){
     listStack.push(name);
   }
 
+  if(name === 'pre'){
+    inPre = true;
+  }
+
+  if(name === 'code' && inPre){
+    stack.pop();
+  }
+
   if(name === 'li'){
+    trimNL = true;
     name = listStack.slice(-1)[0]+'li';
   }
 
@@ -113,6 +125,9 @@ function ontext(text){
     stack.splice(splicePos, 0, text);
     needSplice = false;
   } else {
+    if(trimNL){
+      text = text.trim();
+    }
     stack.push(text);
   }
 }
@@ -123,12 +138,25 @@ function onclosetag(name){
   }
 
   if(name === 'li'){
-    name = listStack.slice(-1)[0];
+    trimNL = false;
+    name = listStack.slice(-1)[0]+'li';
+  }
+
+  if(name === 'pre'){
+    inPre = false;
+  }
+
+  if(name === 'code' && inPre){
+    ignoreClose = true;
   }
 
   var tag = tagTable[name];
-  if(tag){
+  if(tag && !ignoreClose){
     stack.push(tag.close);
+  }
+
+  if(ignoreClose){
+    ignoreClose = false;
   }
 }
 
