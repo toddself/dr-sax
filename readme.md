@@ -30,4 +30,4 @@ npm test
 ```
 
 ## License
-Dr. Sax is ©2014 Todd Kennedy. Available for use under the MIT License.
+Dr. Sax is ©2014 Todd Kennedy. Available for use under the [MIT License](LICENSE).
