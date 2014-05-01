@@ -62,3 +62,15 @@ test('p', function(t){
   t.equal(output, 'this is a test\n\n', 'p');
   t.end();
 });
+
+test('hr', function(t){
+  var output = drsax('<hr>');
+  t.equal(output, '\n\n- - -\n\n', 'hr');
+  t.end();
+});
+
+test('headers', function(t){
+  var output = drsax('<h1>test</h1><h2>test</h2><h3>test</h3><h4>test</h4><h5>test</h5><h6>test</h6>');
+  t.equal(output, '# test\n\n## test\n\n### test\n\n#### test\n\n##### test\n\n###### test\n\n', 'headers');
+  t.end();
+});

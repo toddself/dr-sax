@@ -78,6 +78,34 @@ var tagTable = {
   ulli: {
     open: '*',
     close: '\n'
+  },
+  hr: {
+    open: '\n\n- - -\n\n',
+    close: ''
+  },
+  h1: {
+    open: '# ',
+    close: '\n\n'
+  },
+  h2: {
+    open: '## ',
+    close: '\n\n'
+  },
+  h3: {
+    open: '### ',
+    close: '\n\n'
+  },
+  h4: {
+    open: '#### ',
+    close: '\n\n'
+  },
+  h5: {
+    open: '##### ',
+    close: '\n\n'
+  },
+  h6: {
+    open: '###### ',
+    close: '\n\n'
   }
 };
 
