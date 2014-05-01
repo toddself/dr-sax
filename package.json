@@ -1,0 +1,32 @@
+{
+  "name": "html2markdown",
+  "version": "0.0.0",
+  "description": "An html to markdown converter for node that doesn't use jsdom",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap test/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/toddself/html2markdown"
+  },
+  "keywords": [
+    "markdown",
+    "html",
+    "converter",
+    "pandoc",
+    "html-md"
+  ],
+  "author": "Todd Kennedy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/toddself/html2markdown/issues"
+  },
+  "homepage": "https://github.com/toddself/html2markdown",
+  "dependencies": {
+    "htmlparser2": "^3.7.1"
+  },
+  "devDependencies": {
+    "tap": "^0.4.9"
+  }
+}
