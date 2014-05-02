@@ -157,10 +157,15 @@ DrSax.prototype.onopentag = function(name, attrs){
  * @returns {object} undefined
  */
 DrSax.prototype.ontext = function(text){
+  // if we are in a block level tag that is being indented and
+  // the text we are about to push isn't being proceded by the
+  // open tag for that block level element, add it
   if(this.tag.block && last(this.stack) !== this.tag.open){
     this.stack.push(this.tag.open);
   }
 
+  // if we have to insert the text lower on the stack, this flag will be set,
+  // so splice and then reset the flat
   if(this.needSplice){
     this.stack.splice(this.splicePos, 0, text);
     this.needSplice = false;
@@ -181,28 +186,35 @@ DrSax.prototype.ontext = function(text){
  * @returns {object} undefined
  */
 DrSax.prototype.onclosetag = function(name){
+  // undo our listStack add since we're coming out of the list
   if(name === 'ol' || name === 'ul'){
     this.listStack.pop();
   }
 
+  // reset the parameters for the li
   if(name === 'li'){
     this.trimNL = false;
     name = last(this.listStack)+'li';
   }
 
+  // push a close if we aren't ignoring it and we have one to push
   var tag = tagTable[name];
   if(tag && !this.ignoreClose){
     this.stack.push(tag.close);
   }
 
+  // always reset ignore close -- we might have wanted to ignore this one, but
+  // the next one we'll have to figure out all over again
   if(this.ignoreClose){
     this.ignoreClose = false;
   }
 
+  // if we're in an indentable tag, decrement the indent since we're leaving it.
   if(tag.indent){
     --this.indentStack;
   }
 
+  // handle spacing appropriately for nested block level tag elements.
   if(tag.block){
     if(this.indentStack < 1){
       this.stack.push('\n\n');
@@ -211,7 +223,7 @@ DrSax.prototype.onclosetag = function(name){
     }
   }
 
-
+  // pull the tag off the stack
   this.tagStack.pop();
 };
 
