@@ -36,66 +36,71 @@ module.exports = {
     }
   },
   blockquote: {
-    indent: true,
-    open: '\n\n> ',
-    close: '\n\n'
+    indent: '> ',
+    open: '> ',
+    block: true,
+    close: ''
   },
   code: {
-    open: '\n\n```\n',
-    close: '\n```\n\n'
+    open: '```\n',
+    close: '\n```',
+    block: true
   },
   pre: {
     open: '`',
     close: '`'
   },
   p: {
+    block: true,
     open: '',
-    close: '\n\n'
+    close: ''
   },
   ol: {
-    indent: true,
-    open: '\n\n',
-    close: '\n\n'
+    indent: '\t',
+    block: true,
+    open: '',
+    close: ''
   },
   ul: {
-    indent: true,
-    open: '\n\n',
-    close: '\n\n'
-  },
+    indent: '\t',
+    block: true,
+    open: '',
+    close: ''  },
   olli: {
-    open: '1.',
+    open: '1. ',
     close: '\n'
   },
   ulli: {
-    open: '*',
+    open: '* ',
     close: '\n'
   },
   hr: {
-    open: '\n\n- - -\n\n',
+    block: true,
+    open: '- - -',
     close: ''
   },
   h1: {
     open: '# ',
-    close: '\n\n'
+    close: '\n'
   },
   h2: {
     open: '## ',
-    close: '\n\n'
+    close: '\n'
   },
   h3: {
     open: '### ',
-    close: '\n\n'
+    close: '\n'
   },
   h4: {
     open: '#### ',
-    close: '\n\n'
+    close: '\n'
   },
   h5: {
     open: '##### ',
-    close: '\n\n'
+    close: '\n'
   },
   h6: {
     open: '###### ',
-    close: '\n\n'
+    close: '\n'
   }
 };

@@ -34,14 +34,14 @@ test('images', function(t){
 test('ordered lists', function(t){
   var drsax = new DrSax();
   var output = drsax.write('<ol><li> this is the first <li> this is the second</ol>');
-  t.equal(output, '\n\n1.this is the first\n1.this is the second\n\n\n', 'ordered lists');
+  t.equal(output, '\n\n1. this is the first\n1. this is the second\n\n\n', 'ordered lists');
   t.end();
 });
 
 test('unordered lists', function(t){
   var drsax = new DrSax();
   var output = drsax.write('<ul><li> this is the first <li> this is the second</ul>');
-  t.equal(output, '\n\n*this is the first\n*this is the second\n\n\n', 'ordered lists');
+  t.equal(output, '\n\n* this is the first\n* this is the second\n\n\n', 'ordered lists');
   t.end();
 });
 
@@ -69,7 +69,7 @@ test('code', function(t){
 test('p', function(t){
   var drsax = new DrSax();
   var output = drsax.write('<p>this is a test</p>');
-  t.equal(output, 'this is a test\n\n', 'p');
+  t.equal(output, '\n\nthis is a test\n\n', 'p');
   t.end();
 });
 
@@ -83,6 +83,13 @@ test('hr', function(t){
 test('headers', function(t){
   var drsax = new DrSax();
   var output = drsax.write('<h1>test</h1><h2>test</h2><h3>test</h3><h4>test</h4><h5>test</h5><h6>test</h6>');
-  t.equal(output, '# test\n\n## test\n\n### test\n\n#### test\n\n##### test\n\n###### test\n\n', 'headers');
+  t.equal(output, '# test\n## test\n### test\n#### test\n##### test\n###### test\n', 'headers');
+  t.end();
+});
+
+test('indenting', function(t){
+  var drsax = new DrSax();
+  var output = drsax.write('<blockquote>this is a <blockquote>test man</blockquote>you are just a test</blockquote>');
+  t.equal(output, '\n\n> this is a \n> > test man\n> you are just a test\n\n');
   t.end();
 });

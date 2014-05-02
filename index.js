@@ -23,7 +23,7 @@ function last(arr){
  * @returns {string} the string repeated itr times
  */
 function repeat(chr, itr){
-  return new Array(itr+1).join(chr);
+  return new Array(itr+1).join(chr || '');
 }
 
 /**
@@ -37,6 +37,15 @@ function DrSax(){
     ontext: this.ontext.bind(this),
     onclosetag: this.onclosetag.bind(this)
   });
+  this._init();
+}
+
+/**
+ * Reset the whole system.
+ * @method  _init
+ * @returns {object} undefined
+ */
+DrSax.prototype._init = function(){
   this.stack = [];
   this.splicePos = 0;
   this.needSplice = false;
@@ -45,7 +54,7 @@ function DrSax(){
   this.tagStack = [];
   this.ignoreClose = false;
   this.indentStack = 0;
-}
+};
 
 /**
  * Write a string of HTML to the converter and receive a string of markdown back
@@ -58,7 +67,7 @@ DrSax.prototype.write = function(html){
   this.parser.write(html);
   this.parser.end();
   var markdown = this.stack.join('');
-  this.stack.length = 0; // clear the stack incase we use this again
+  this._init();
   return markdown;
 };
 
@@ -79,8 +88,8 @@ DrSax.prototype.onopentag = function(name, attrs){
     name = last(this.listStack)+'li';
   }
 
-  var tag = tagTable[name];
-  if(tag){
+  this.tag = tagTable[name];
+  if(this.tag){
     this.tagStack.push(name);
     // The wrapper tags for lists don't actually generate markdown,
     // but they influence the markdown that we're generating for their
@@ -98,20 +107,31 @@ DrSax.prototype.onopentag = function(name, attrs){
       this.stack.pop();
     }
 
+    // Block level tags that aren't being indented need to be appropriately
+    // spaced out.
+    if(this.tag.block && this.indentStack < 1){
+      this.stack.push('\n\n');
+    }
+
     // if we are in a tag that allows tags "inside" of it, we need to maintain
-    // the proper amount of indentation
-    this.stack.push(repeat('\t', this.indentStack));
-    if(tag.indent){
+    // the proper amount of indentation. We'll generate what the containing tag
+    // wants for an index, and if there is an indent, we'll put a newline in front
+    var indentText = repeat(this.tag.indent, this.indentStack);
+    if(indentText.length){
+      indentText = '\n'+indentText;
+    }
+    this.stack.push(indentText);
+    if(this.tag.indent){
       ++this.indentStack;
     }
 
-    this.stack.push(tag.open);
-    if(tag.attrs){
-      var keys = Object.keys(tag.attrs);
+    this.stack.push(this.tag.open);
+    if(this.tag.attrs){
+      var keys = Object.keys(this.tag.attrs);
       var len = keys.length;
       for(var i = 0; i < len; i++){
         var key = keys[i];
-        this.stack.push(tag.attrs[key].open);
+        this.stack.push(this.tag.attrs[key].open);
         // if we need to get the tags containing text in here, we have to handle
         // it specially and splice it into an earlier position in the stack
         // since we don't have access to the text right now
@@ -122,7 +142,7 @@ DrSax.prototype.onopentag = function(name, attrs){
         } else if (Object.keys(attrs).indexOf(key) !== -1){
           this.stack.push(attrs[key]);
         }
-        this.stack.push(tag.attrs[key].close);
+        this.stack.push(this.tag.attrs[key].close);
       }
     }
   }
@@ -137,6 +157,10 @@ DrSax.prototype.onopentag = function(name, attrs){
  * @returns {object} undefined
  */
 DrSax.prototype.ontext = function(text){
+  if(this.tag.block && last(this.stack) !== this.tag.open){
+    this.stack.push(this.tag.open);
+  }
+
   if(this.needSplice){
     this.stack.splice(this.splicePos, 0, text);
     this.needSplice = false;
@@ -174,9 +198,21 @@ DrSax.prototype.onclosetag = function(name){
   if(this.ignoreClose){
     this.ignoreClose = false;
   }
+
   if(tag.indent){
     --this.indentStack;
   }
+
+  if(tag.block){
+    if(this.indentStack < 1){
+      this.stack.push('\n\n');
+    } else {
+      this.stack.push('\n');
+    }
+  }
+
+
+  this.tagStack.pop();
 };
 
 module.exports = DrSax;
