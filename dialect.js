@@ -4,8 +4,8 @@ module.exports = {
     close: '**'
   },
   i: {
-    open: '*',
-    close: '*'
+    open: '_',
+    close: '_'
   },
   img: {
     open: '!',
