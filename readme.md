@@ -14,6 +14,34 @@ There are a few node.js based html to markdown converters available, why do we n
 1. [html-md](https://github.com/neocotic/html.md) and [upndown](https://github.com/netgusto/upndown) are both jsdom based for node.js. JSDOM is slow, and [has some memory issues when used in a loop](https://github.com/neocotic/html.md/pull/43)
 2. Others use regular expressions to parse your HTML. Why hello Zalgo! Nice to meet you today!
 
+## Benchmarking
+
+Benchmarks are available in [Dr. Sax Benchmarks](https://github.com/toddself/dr-sax-benchmarks).
+
+Here are the results for:
+
+```json
+"dependencies": {
+    "dr-sax": "1.0.0",
+    "html-md": "3.0.2",
+    "pdc": "0.1.2",
+    "upndown": "0.0.7"
+}
+```
+
+(pdc is using Pandoc 1.12.3)
+
+```
+> dr-sax-benchmarks@0.0.0 start /Users/tkenned2/src/dr-sax-benchmarks
+> node index
+
+dr sax x 4,236 ops/sec ±0.89% (92 runs sampled)
+htmlmd x 150 ops/sec ±2.89% (75 runs sampled)
+upndown x 139 ops/sec ±2.48% (75 runs sampled)
+pdc x 20.81 ops/sec ±1.22% (54 runs sampled)
+Fastest is dr sax
+```
+
 ## Installing
 
 `npm install --save dr-sax`
