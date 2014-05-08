@@ -98,9 +98,20 @@ DrSax.prototype._init = function(){
 DrSax.prototype.write = function(html){
   this.parser.write(html);
   this.parser.end();
+  if(this.tagStack.length > 0){
+    this._closeUnclosedTags();
+  }
   var markdown = this.stack.join('');
   this._init();
   return markdown;
+};
+
+DrSax.prototype._closeUnclosedTags = function(){
+  var tag = this.tagStack.pop();
+  while (tag){
+    this.onclosetag(tag);
+    tag = this.tagStack.pop();
+  }
 };
 
 /**

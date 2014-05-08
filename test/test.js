@@ -13,7 +13,7 @@ test('bolding', function(t){
 test('italics', function(t){
   var drsax = new DrSax();
   var output = drsax.write('<i>this is a test</i>');
-  t.equal(output, '*this is a test*', 'italics');
+  t.equal(output, '_this is a test_', 'italics');
   t.end();
 });
 
@@ -105,5 +105,12 @@ test('strip tags off', function(t){
   var drsax = new DrSax();
   var output = drsax.write('<b>This is a test <span class="foo">of stripping unknown tags</span></b>');
   t.equal(output, '**This is a test <span class="foo">of stripping unknown tags</span>**', 'leaving in tags');
+  t.end();
+});
+
+test('unclosed html', function(t){
+  var drsax = new DrSax();
+  var output = drsax.write('<b>this is a test <i>with unclosed tags');
+  t.equal(output, '**this is a test _with unclosed tags_**');
   t.end();
 });
