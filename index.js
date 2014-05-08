@@ -27,17 +27,49 @@ function repeat(chr, itr){
 }
 
 /**
+ * Reconstruct an HTML tag for normal mode operations based on the data
+ * provided by the callbacks in htmlparser2's parser.
+ * @method  rebuildTag
+ * @param   {string} name Tag name
+ * @param   {object} [attrs] Attributes, if any, for the tag
+ * @param   {string} [pos=close] Position: open or close
+ * @returns {string} Rebuilt open or close tag
+ */
+function rebuildTag(name, attrs, pos){
+  pos = pos || attrs;
+  var tag;
+  var attrStr;
+
+  if(pos === 'open'){
+    attrStr = Object.keys(attrs).reduce(function(a, key) {
+      a.push([key,'="', attrs[key], '"'].join(''));
+      return a;
+    }, []).join(' ');
+
+    if(attrStr.length > 0){
+      tag =  ['<', name, ' ', attrStr, '>'].join('');
+    } else {
+      tag = ['<', name, '>'].join('');
+    }
+    return tag;
+  } else {
+    return ['</', name, '>'].join('');
+  }
+}
+
+/**
  * DrSax is a SAX based HTML to Markdown converter.
  * @namespace DrSax
  * @method DrSax
  */
-function DrSax(){
+function DrSax(options){
   this.parser = new htmlparser2.Parser({
     onopentag: this.onopentag.bind(this),
     ontext: this.ontext.bind(this),
     onclosetag: this.onclosetag.bind(this)
   });
   this._init();
+  this.options = options || {};
 }
 
 /**
@@ -80,6 +112,7 @@ DrSax.prototype.write = function(html){
  * @returns {object} undefined
  */
 DrSax.prototype.onopentag = function(name, attrs){
+  var origName = name;
   // we want to trim <li> elements so they don't generate multiple lists
   // also here we will determine what actual markdown token to insert
   // based on the parent element for the <li> that we captured above
@@ -145,6 +178,10 @@ DrSax.prototype.onopentag = function(name, attrs){
         this.stack.push(this.tag.attrs[key].close);
       }
     }
+  } else {
+    if(!this.options.stripTags){
+      this.stack.push(rebuildTag(origName, attrs, 'open'));
+    }
   }
 };
 
@@ -160,7 +197,7 @@ DrSax.prototype.ontext = function(text){
   // if we are in a block level tag that is being indented and
   // the text we are about to push isn't being proceded by the
   // open tag for that block level element, add it
-  if(this.tag.block && last(this.stack) !== this.tag.open){
+  if(this.tag && this.tag.block && last(this.stack) !== this.tag.open){
     this.stack.push(this.tag.open);
   }
 
@@ -186,6 +223,7 @@ DrSax.prototype.ontext = function(text){
  * @returns {object} undefined
  */
 DrSax.prototype.onclosetag = function(name){
+  var origName = name;
   // undo our listStack add since we're coming out of the list
   if(name === 'ol' || name === 'ul'){
     this.listStack.pop();
@@ -199,32 +237,36 @@ DrSax.prototype.onclosetag = function(name){
 
   // push a close if we aren't ignoring it and we have one to push
   var tag = tagTable[name];
-  if(tag && !this.ignoreClose){
-    this.stack.push(tag.close);
-  }
+  if(tag){
+     if(!this.ignoreClose){
+       this.stack.push(tag.close);
+     }
+    // if we're in an indentable tag, decrement the indent since we're leaving it.
+    if(tag.indent){
+      --this.indentStack;
+    }
 
+    // handle spacing appropriately for nested block level tag elements.
+    if(tag.block){
+      if(this.indentStack < 1){
+        this.stack.push('\n\n');
+      } else {
+        this.stack.push('\n');
+      }
+    }
+
+    // pull the tag off the stack
+    this.tagStack.pop();
+  } else {
+    if(!this.options.stripTags){
+      this.stack.push(rebuildTag(origName));
+    }
+  }
   // always reset ignore close -- we might have wanted to ignore this one, but
   // the next one we'll have to figure out all over again
   if(this.ignoreClose){
     this.ignoreClose = false;
   }
-
-  // if we're in an indentable tag, decrement the indent since we're leaving it.
-  if(tag.indent){
-    --this.indentStack;
-  }
-
-  // handle spacing appropriately for nested block level tag elements.
-  if(tag.block){
-    if(this.indentStack < 1){
-      this.stack.push('\n\n');
-    } else {
-      this.stack.push('\n');
-    }
-  }
-
-  // pull the tag off the stack
-  this.tagStack.pop();
 };
 
 module.exports = DrSax;

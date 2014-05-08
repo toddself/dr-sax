@@ -90,6 +90,20 @@ test('headers', function(t){
 test('indenting', function(t){
   var drsax = new DrSax();
   var output = drsax.write('<blockquote>this is a <blockquote>test man</blockquote>you are just a test</blockquote>');
-  t.equal(output, '\n\n> this is a \n> > test man\n> you are just a test\n\n');
+  t.equal(output, '\n\n> this is a \n> > test man\n> you are just a test\n\n', 'indenting for block level tags');
+  t.end();
+});
+
+test('strip tags on', function(t){
+  var drsax = new DrSax({stripTags: true});
+  var output = drsax.write('<b>This is a test <span class="foo">of stripping unknown tags</span></b>');
+  t.equal(output, '**This is a test of stripping unknown tags**', 'stripping tags');
+  t.end();
+});
+
+test('strip tags off', function(t){
+  var drsax = new DrSax();
+  var output = drsax.write('<b>This is a test <span class="foo">of stripping unknown tags</span></b>');
+  t.equal(output, '**This is a test <span class="foo">of stripping unknown tags</span>**', 'leaving in tags');
   t.end();
 });
