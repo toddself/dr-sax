@@ -35,10 +35,10 @@ Here are the results for:
 > dr-sax-benchmarks@0.0.0 start /Users/tkenned2/src/dr-sax-benchmarks
 > node index
 
-dr sax x 4,236 ops/sec ±0.89% (92 runs sampled)
-htmlmd x 150 ops/sec ±2.89% (75 runs sampled)
-upndown x 139 ops/sec ±2.48% (75 runs sampled)
-pdc x 20.81 ops/sec ±1.22% (54 runs sampled)
+dr sax x 3,945 ops/sec ±1.11% (90 runs sampled)
+htmlmd x 150 ops/sec ±3.01% (76 runs sampled)
+upndown x 132 ops/sec ±4.32% (74 runs sampled)
+pdc x 19.04 ops/sec ±18.95% (54 runs sampled)
 Fastest is dr sax
 ```
 
