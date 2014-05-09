@@ -20,9 +20,9 @@ Benchmarks are available in [Dr. Sax Benchmarks](https://github.com/toddself/dr-
 
 Here are the results for:
 
-```json
+```
 "dependencies": {
-    "dr-sax": "1.0.0",
+    "dr-sax": "1.0.1",
     "html-md": "3.0.2",
     "pdc": "0.1.2",
     "upndown": "0.0.7"
