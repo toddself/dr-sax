@@ -3,6 +3,14 @@ module.exports = {
     open: '**',
     close: '**'
   },
+  strong: {
+    open: '**',
+    close: '**'
+  },
+  em: {
+    open: '_',
+    close: '_'
+  },
   i: {
     open: '_',
     close: '_'
