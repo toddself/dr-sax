@@ -94,7 +94,7 @@ Custom dialects can be supplied to the parser. You can get a general concept of 
 A dialect is an object with the top-level keys being the HTML tags you're trying to convert. Each of these points to an object with an `open` and `close` key, which is the markdown token to insert instead of the `open`ing HTML tag, and the one use instead of the `close`ing tag. You can omit a tag by just using an empty string. If the tag is indentable (like `<blockquote>`), set that flag to `true`. If the tag is a block-level element, set that flag to `true` as well so that the correct line-spacing will be entered.  If the tag requires attributes to be parsed, create a new key called `attrs` which is an object explaining how to deal with the attributes for that tag.
 
 **e.g.**
-The anchor tag is `<a href="url">captured text</a>`, but in markdown you need [captured text](url).
+The anchor tag is `<a href="url">captured text</a>`, but in markdown you need `[captured text](url)`.
 
 This is defined as:
 
