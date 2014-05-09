@@ -29,6 +29,8 @@ Here are the results for:
 }
 ```
 
+On an early 2013 MacBook Pro w/ retina display.
+
 (pdc is using Pandoc 1.12.3)
 
 ```
@@ -54,7 +56,7 @@ _Non-Streaming_
 > var DrSax = require('dr-sax');
 > var drsax = new DrSax();
 > drsax.write('<p>Wow, this is an <b>awesome</b> HTML parser dude! You should <a href="http://yahoo.com">submit it to yahoo!</a>');
-"Wow, this is an **awesome** HTML parser dude! You should [submit it to yahoo!](http://yahoo.com)"
+"\n\nWow, this is an **awesome** HTML parser dude! You should [submit it to yahoo!](http://yahoo.com)\n\n"
 ```
 
 _Streaming_
@@ -65,6 +67,7 @@ _Streaming_
 ```
 
 _Stripping out non-Markdown tags_
+
 ```javascript
 > var DrSax = require('dr-sax');
 > var drsax = new DrSax({stripTags: true});
@@ -74,6 +77,47 @@ _Stripping out non-Markdown tags_
 > drsax2.write('<span class="txt-center"><b>centered text</b></span>');
 "<span class=\"txt-center\">**centered text**</span>"
 ```
+
+_Supply your own markdown dialect_
+
+```javascript
+> var dialect = {b: {open: '__', close: '__'}};
+> var DrSax = require('dr-sax');
+> var drsax = new DrSax({dialect: dialect});
+> drsax.write('<p>Wow, this is an <b>awesome</b> HTML parser dude! You should <a href="http://yahoo.com">submit it to yahoo!</a>');
+"\n\nWow, this is an __awesome__ HTML parser dude! You should [submit it to yahoo!](http://yahoo.com)\n\n"
+```
+
+## Dialects
+Custom dialects can be supplied to the parser. You can get a general concept of how they're defined by looking at [dialect.js](dialect.js).
+
+A dialect is an object with the top-level keys being the HTML tags you're trying to convert. Each of these points to an object with an `open` and `close` key, which is the markdown token to insert instead of the `open`ing HTML tag, and the one use instead of the `close`ing tag. You can omit a tag by just using an empty string. If the tag is indentable (like `<blockquote>`), set that flag to `true`. If the tag is a block-level element, set that flag to `true` as well so that the correct line-spacing will be entered.  If the tag requires attributes to be parsed, create a new key called `attrs` which is an object explaining how to deal with the attributes for that tag.
+
+**e.g.**
+The anchor tag is `<a href="url">captured text</a>`, but in markdown you need [captured text](url).
+
+This is defined as:
+
+```javascript
+{
+  a: {
+    open: '',
+    close: '',
+    attrs: {
+      text: {
+        open: '[',
+        close: ']'
+      },
+      href: {
+        open: '(',
+        close: ')'
+      }
+    }
+  }
+}
+```
+
+The nodes in `attrs` are processed in order -- so since the "text" (which is anything in the `captured text` section) needs to come first, we list it first. And since the text needs to be wrapped in `[` and `]`, we note those as the open and close.  Same goes for the `href` tag. Since that completes the entire tag, we actually leave the `open` and `close` for the `<a>` itself empty since it requires no additional tokens.
 
 ## Testing
 
