@@ -10,6 +10,20 @@ test('bolding', function(t){
   t.end();
 });
 
+test('strong', function(t){
+  var drsax = new DrSax();
+  var output = drsax.write('<strong>this is a test</strong>');
+  t.equal(output, '**this is a test**', 'strong');
+  t.end();
+});
+
+test('em', function(t){
+  var drsax = new DrSax();
+  var output = drsax.write('<em>this is a test</em>');
+  t.equal(output, '_this is a test_', 'em');
+  t.end();
+});
+
 test('italics', function(t){
   var drsax = new DrSax();
   var output = drsax.write('<i>this is a test</i>');
