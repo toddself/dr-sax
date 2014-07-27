@@ -104,7 +104,7 @@ test('headers', function(t){
 test('indenting', function(t){
   var drsax = new DrSax();
   var output = drsax.write('<blockquote>this is a <blockquote>test man</blockquote>you are just a test</blockquote>');
-  t.equal(output, '\n\n> this is a \n> > test man\n> you are just a test\n\n', 'indenting for block level tags');
+  t.equal(output, '\n\n> this is a\n> > test man\n> you are just a test\n\n', 'indenting for block level tags');
   t.end();
 });
 
