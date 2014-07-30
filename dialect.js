@@ -1,4 +1,8 @@
 module.exports = {
+  br: {
+    open: '\n',
+    close: '\n'
+  },
   b: {
     open: '**',
     close: '**'
