@@ -1,6 +1,6 @@
 {
   "name": "dr-sax",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "An html to markdown converter for node that doesn't use jsdom",
   "main": "index.js",
   "scripts": {
