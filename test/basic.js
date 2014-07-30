@@ -97,7 +97,7 @@ test('hr', function(t){
 test('headers', function(t){
   var drsax = new DrSax();
   var output = drsax.write('<h1>test</h1><h2>test</h2><h3>test</h3><h4>test</h4><h5>test</h5><h6>test</h6>');
-  t.equal(output, '# test\n## test\n### test\n#### test\n##### test\n###### test\n', 'headers');
+  t.equal(output, '\n# test\n\n## test\n\n### test\n\n#### test\n\n##### test\n\n###### test\n', 'headers');
   t.end();
 });
 

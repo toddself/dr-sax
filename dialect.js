@@ -88,27 +88,27 @@ module.exports = {
     close: ''
   },
   h1: {
-    open: '# ',
+    open: '\n# ',
     close: '\n'
   },
   h2: {
-    open: '## ',
+    open: '\n## ',
     close: '\n'
   },
   h3: {
-    open: '### ',
+    open: '\n### ',
     close: '\n'
   },
   h4: {
-    open: '#### ',
+    open: '\n#### ',
     close: '\n'
   },
   h5: {
-    open: '##### ',
+    open: '\n##### ',
     close: '\n'
   },
   h6: {
-    open: '###### ',
+    open: '\n###### ',
     close: '\n'
   }
 };
