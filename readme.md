@@ -25,6 +25,7 @@ Here are the results for:
     "dr-sax": "1.0.1",
     "html-md": "3.0.2",
     "pdc": "0.1.2",
+    "to-markdown": "0.0.2",
     "upndown": "0.0.7"
 }
 ```
@@ -34,13 +35,14 @@ On an early 2013 MacBook Pro w/ retina display.
 (pdc is using Pandoc 1.12.3)
 
 ```
-> dr-sax-benchmarks@0.0.0 start /Users/tkenned2/src/dr-sax-benchmarks
+> dr-sax-benchmarks@0.0.0 start /Users/todd/src/dr-sax-benchmarks
 > node index
 
-dr sax x 3,945 ops/sec ±1.11% (90 runs sampled)
-htmlmd x 150 ops/sec ±3.01% (76 runs sampled)
-upndown x 132 ops/sec ±4.32% (74 runs sampled)
-pdc x 19.04 ops/sec ±18.95% (54 runs sampled)
+dr sax x 6,825 ops/sec ±1.10% (91 runs sampled)
+htmlmd x 233 ops/sec ±3.97% (75 runs sampled)
+upndown x 198 ops/sec ±6.77% (75 runs sampled)
+to-markdown x 6,719 ops/sec ±1.04% (88 runs sampled)
+pdc x 27.40 ops/sec ±0.83% (68 runs sampled)
 Fastest is dr sax
 ```
 
