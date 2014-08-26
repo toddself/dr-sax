@@ -8,78 +8,6 @@ Dr. SAX is an HTML to markdown converter that uses a [SAX-based parser](http://g
 
 It presents both a standard (non-streaming) and transform stream interface for converting HTML to markdown.
 
-## Why?
-There are a few node.js based html to markdown converters available, why do we need another?
-
-1. [html-md](https://github.com/neocotic/html.md) and [upndown](https://github.com/netgusto/upndown) are both jsdom based for node.js. JSDOM is slow, and [has some memory issues when used in a loop](https://github.com/neocotic/html.md/pull/43)
-2. Others use regular expressions to parse your HTML. Why hello Zalgo! Nice to meet you today!
-
-## Benchmarking & Compliance
-
-Benchmarks are available in [Dr. Sax Benchmarks](https://github.com/toddself/dr-sax-benchmarks).
-
-Here are the results for:
-
-```
-"dependencies": {
-  "benchmark": "~1.0.0",
-  "dr-sax": "~1.0.5",
-  "hammerdown": "0.0.18",
-  "html-md": "~3.0.2",
-  "html2markdown": "~1.1.0",
-  "pdc": "~0.1.2",
-  "to-markdown": "0.0.2",
-  "unmarked": "0.0.12",
-  "upndown": "~0.0.7"
-}
-```
-
-On a 2014 quad-core 3.5gHz Core i7 iMac running node 0.10.28
-
-(pdc is using Pandoc 1.12.3)
-
-```
-> dr-sax-benchmarks@0.0.0 start /Users/todd/src/dr-sax-benchmarks
-> node index
-
-dr sax x 5,774 ops/sec ±1.55% (97 runs sampled)
-htmlmd x 231 ops/sec ±4.45% (75 runs sampled)
-upndown x 219 ops/sec ±7.90% (77 runs sampled)
-to-markdown x 6,813 ops/sec ±0.89% (91 runs sampled)
-html2markdown x 2,420 ops/sec ±4.34% (92 runs sampled)
-unmarked:
-hammerdown x 982 ops/sec ±1.35% (65 runs sampled)
-pdc x 27.02 ops/sec ±0.31% (67 runs sampled)
-Fastest is to-markdown
-```
-
-However, [`to-markdown`](https://github.com/domchristie/to-markdown) does not handle malformed HTML well:
-
-```
-> var drsax = new (require('dr-sax'))();
-> var bs = '<b>this is a totally<i>Broken</b> string that I want parsed';
-> drsax.write(bs);
-
-'**this is a totally_Broken_** string that I want parsed'
-
-> var tomd = require('to-markdown').toMarkdown;
-> tomd(bs);
-
-'**this is a totally<i>Broken** string that I want parsed'
-```
-
-Both of the DOM based parsers ([html-md](https://github.com/neocotic/html.md) and [upndown](https://github.com/netgusto/upndown/)) handle that string identically to how Dr. Sax handles it.  
-
-[unmarked](https://github.com/tcr/unmarked) does not seem to work correctly however:
-
-```
-> var unmarked = require('unmarked');
-undefined
-> unmarked.parse('<b>test</b>');
-'test'
-```
-
-
 ## Installing
 
 `npm install --save dr-sax`
@@ -123,6 +51,127 @@ _Supply your own markdown dialect_
 > drsax.write('<p>Wow, this is an <b>awesome</b> HTML parser dude! You should <a href="http://yahoo.com">submit it to yahoo!</a>');
 "\n\nWow, this is an __awesome__ HTML parser dude! You should [submit it to yahoo!](http://yahoo.com)\n\n"
 ```
+
+## Why?
+There are a few node.js based html to markdown converters available, why do we need another?
+
+1. [html-md](https://github.com/neocotic/html.md) and [upndown](https://github.com/netgusto/upndown) are both jsdom based for node.js. JSDOM is slow, and [has some memory issues when used in a loop](https://github.com/neocotic/html.md/pull/43)
+2. Others use regular expressions to parse your HTML. Why hello Zalgo! Nice to meet you today!
+
+## Benchmarking & Compliance
+
+Benchmarks are available in [Dr. Sax Benchmarks](https://github.com/toddself/dr-sax-benchmarks).
+
+Here are the results for:
+
+```
+"dependencies": {
+  "benchmark": "~1.0.0",
+  "dr-sax": "~1.0.7",
+  "hammerdown": "0.0.18",
+  "html-md": "~3.0.2",
+  "html2markdown": "~1.1.0",
+  "pdc": "~0.1.2",
+  "to-markdown": "0.0.2",
+  "unmarked": "0.0.12",
+  "upndown": "~0.0.7"
+}
+```
+
+On a 2014 quad-core 3.5gHz Core i7 iMac running node 0.10.28
+
+(pdc is using Pandoc 1.12.3)
+
+```
+> dr-sax-benchmarks@0.0.0 start /Users/todd/src/dr-sax-benchmarks
+> node index
+
+dr sax x 5,838 ops/sec ±1.90% (92 runs sampled)
+htmlmd x 228 ops/sec ±4.27% (75 runs sampled)
+upndown x 216 ops/sec ±6.05% (83 runs sampled)
+to-markdown x 6,696 ops/sec ±5.03% (90 runs sampled)
+html2markdown x 2,400 ops/sec ±5.08% (87 runs sampled)
+unmarked:
+hammerdown x 932 ops/sec ±6.56% (74 runs sampled)
+pdc x 24.07 ops/sec ±17.90% (66 runs sampled)
+Fastest is to-markdown
+```
+
+The fastest is *not* Dr. Sax, but rather [`to-markdown`](https://github.com/domchristie/to-markdown). Alas, `to-markdown` does not handle malformed HTML well as it is based on a regular-expression type parser:
+
+```
+> var drsax = new (require('dr-sax'))();
+> var bs = '<b>this is a totally<i>Broken</b> string that I want parsed';
+> drsax.write(bs);
+
+'**this is a totally_Broken_** string that I want parsed'
+
+> var tomd = require('to-markdown').toMarkdown;
+> tomd(bs);
+
+'**this is a totally<i>Broken** string that I want parsed'
+```
+
+Both of the DOM based parsers ([html-md](https://github.com/neocotic/html.md) and [upndown](https://github.com/netgusto/upndown/)) handle that string identically to how Dr. Sax handles it.  
+
+[unmarked](https://github.com/tcr/unmarked) does not seem to work correctly however:
+
+```
+> var unmarked = require('unmarked');
+undefined
+> unmarked.parse('<b>test</b>');
+'test'
+```
+
+## Round Trip Conversion
+
+All attempts are made to ensure that HTML -> MD -> HTML conversion is as loss-less as possible.  There are some caveats and quirks being that Markdown is a whitespace significant language and HTML is not. 
+
+The primary munging occurs if your input is pretty-printed HTML.
+
+```html
+<h1>Why use <a href="https://github.com/toddself/dr-sax/">Dr. Sax</a></h1>
+<ol>
+  <li>Becuase you like puns!</li>
+  <li>Becuase you need speed</li>
+</ol>
+<strong>This is going to be bold!</strong>
+<h2>Kittens</h2>Look at these funny little furry things!
+<iframe width="560" height="315" src="//www.youtube.com/embed/h_hKJCe_-sI" frameborder="0" allowfullscreen></iframe>
+```
+
+This will convert to the following markdown
+
+```markdown
+# Why use [Dr. Sax](https://github.com/toddself/dr-sax/)
+
+1. Becuase you like puns!
+1. Becuase you need speed
+
+
+**This is going to be bold!**
+
+## Kittens
+
+Look at these funny little furry things!<iframe width="560" height="315" src="//www.youtube.com/embed/h<em>hKJCe</em>-sI" frameborder="0" allowfullscreen=""></iframe>
+```
+
+But, will convert back to the following HTML (using [marked](https://github.com/chjj/marked))
+
+```html
+<h1 id="why-use-dr-sax-https-github-com-toddself-dr-sax-">Why use <a href="https://github.com/toddself/dr-sax/">Dr. Sax</a></h1>
+<ol>
+<li>Becuase you like puns!</li>
+<li>Becuase you need speed</li>
+</ol>
+<p><strong>This is going to be bold!</strong></p>
+<h2 id="kittens">Kittens</h2>
+<p>Look at these funny little furry things!<iframe width="560" height="315" src="//www.youtube.com/embed/h_hKJCe_-sI" frameborder="0" allowfullscreen=""></iframe></p>
+```
+
+The `tab` characters from the `<ol>` are missing, and the `<iframe>` and `<strong>` tags are wrapped in paragraphs.  This is a result of how Markdown's dialect handles block-level elements like the `<ol>` and `<h2>` tags in the page.
+
+There is a specially formatted test to verify round-trip results in the test suite for compliance.
 
 ## Dialects
 Custom dialects can be supplied to the parser. You can get a general concept of how they're defined by looking at [dialect.js](dialect.js).
