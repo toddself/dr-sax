@@ -30,6 +30,7 @@
     "readable-stream": "~1.0.27-1"
   },
   "devDependencies": {
+    "markdown": "~0.5.0",
     "tap": "~0.4.9"
   }
 }

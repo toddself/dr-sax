@@ -77,7 +77,8 @@ module.exports = {
     indent: '\t',
     block: true,
     open: '',
-    close: ''  },
+    close: ''  
+  },
   olli: {
     open: '1. ',
     close: '\n'
@@ -92,27 +93,33 @@ module.exports = {
     close: ''
   },
   h1: {
-    open: '\n# ',
-    close: '\n'
+    block: true,
+    open: '# ',
+    close: false
   },
   h2: {
-    open: '\n## ',
-    close: '\n'
+    block: true,
+    open: '## ',
+    close: false
   },
   h3: {
-    open: '\n### ',
-    close: '\n'
+    block: true,
+    open: '### ',
+    close: false
   },
   h4: {
-    open: '\n#### ',
-    close: '\n'
+    block: true,
+    open: '#### ',
+    close: false
   },
   h5: {
-    open: '\n##### ',
-    close: '\n'
+    block: true,
+    open: '##### ',
+    close: false
   },
   h6: {
-    open: '\n###### ',
-    close: '\n'
+    block: true,
+    open: '###### ',
+    close: false
   }
 };
