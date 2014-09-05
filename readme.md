@@ -8,6 +8,9 @@ Dr. SAX is an HTML to markdown converter that uses a [SAX-based parser](http://g
 
 It presents both a standard (non-streaming) and transform stream interface for converting HTML to markdown.
 
+## Compliance
+This library is [<span style="text-decoration: strikethrough">Standard</span> Common Markdown](https://github.com/jgm/stmd) compliant. The only difference between the input HTML and the output HTML is the lack of additional `\n` characters around block level elements.  Since HTML is whitespace agnostic, these do not present a material difference in the rendering of the HTML by a user-agent.  You can test markdown compliance against both [marked](https://github.com/chjj/marked) and stmd by running the test suite.
+
 ## Installing
 
 `npm install --save dr-sax`
@@ -112,7 +115,7 @@ The fastest is *not* Dr. Sax, but rather [`to-markdown`](https://github.com/domc
 '**this is a totally<i>Broken** string that I want parsed'
 ```
 
-Both of the DOM based parsers ([html-md](https://github.com/neocotic/html.md) and [upndown](https://github.com/netgusto/upndown/)) handle that string identically to how Dr. Sax handles it.  
+Both of the DOM based parsers ([html-md](https://github.com/neocotic/html.md) and [upndown](https://github.com/netgusto/upndown/)) handle that string identically to how Dr. Sax handles it.
 
 [unmarked](https://github.com/tcr/unmarked) does not seem to work correctly however:
 
@@ -125,7 +128,7 @@ undefined
 
 ## Round Trip Conversion
 
-All attempts are made to ensure that HTML -> MD -> HTML conversion is as loss-less as possible.  There are some caveats and quirks being that Markdown is a whitespace significant language and HTML is not. 
+All attempts are made to ensure that HTML -> MD -> HTML conversion is as loss-less as possible.  There are some caveats and quirks being that Markdown is a whitespace significant language and HTML is not.
 
 The primary munging occurs if your input is pretty-printed HTML.
 
