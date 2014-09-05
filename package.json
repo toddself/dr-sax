@@ -27,7 +27,8 @@
   "homepage": "https://github.com/toddself/dr-sax",
   "dependencies": {
     "htmlparser2": "~3.7.1",
-    "readable-stream": "~1.0.27-1"
+    "readable-stream": "~1.0.27-1",
+    "stmd": "toddself/stmd#master"
   },
   "devDependencies": {
     "markdown": "~0.5.0",
