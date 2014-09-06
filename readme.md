@@ -8,9 +8,6 @@ Dr. SAX is an HTML to markdown converter that uses a [SAX-based parser](http://g
 
 It presents both a standard (non-streaming) and transform stream interface for converting HTML to markdown.
 
-## Compliance
-This library is [<span style="text-decoration: strikethrough">Standard</span> Common Markdown](https://github.com/jgm/stmd) compliant. The only difference between the input HTML and the output HTML is the lack of additional `\n` characters around block level elements.  Since HTML is whitespace agnostic, these do not present a material difference in the rendering of the HTML by a user-agent.  You can test markdown compliance against both [marked](https://github.com/chjj/marked) and stmd by running the test suite.
-
 ## Installing
 
 `npm install --save dr-sax`
@@ -128,15 +125,55 @@ undefined
 
 ## Round Trip Conversion
 
-All attempts are made to ensure that HTML -> MD -> HTML conversion is as loss-less as possible.  There are some caveats and quirks being that Markdown is a whitespace significant language and HTML is not.
+The test [tests/throughput-compliance.js](throughput-compliance.js) attempts to test HTML -> Markdown -> HTML conversion using the following Markdown -> HTML converters:
+
+* [Gruber](http://daringfireball.net/projects/markdown)
+* [Marked](https://github.com/chjj/marked)
+* [CommonMark](https://github.com/jgm/stmd) (via [my fork](https://github.com/toddself/stmd) which allows installation via NPM)
+* [Markdown-JS](https://github.com/evilstreak/markdown-js)
+
+Currently both CommonMark and Markdown-JS are considered (by me) non-conforming Markdown -> HTML renderers due to their handling of block-level `<iframe>` tags. Their lack of conformance is not due to how Dr. Sax generates its output.  
+
+These are being tracked by:
+* [markdown-js bug 212](https://github.com/evilstreak/markdown-js/issues/212)
+* [stmd bug 88](https://github.com/jgm/stmd/issues/88)
+
+The issue is pretty simple:
+
+Given the following input
+
+```html
+<p>I am a <strong>paragraph</strong> of text</p>
+<iframe></iframe>
+```
+
+Dr Sax will create the following Markdown
+
+```markdown
+I am a **paragraph** of text
+
+<iframe></iframe>
+```
+
+Both Gruber and Marked accept this input and regenerate the original input HTML. However, stmd and Markdown-js output:
+
+```html
+<p>I am a <strong>paragraph</strong> of test</p>
+
+<p><iframe></iframe></p>
+```
+
+Wrapping the `<iframe>` tag in an extraneous `<p>` tag makes them very hard to style appropriately without doing crazy tricks, so I'm going to side with Gruber and Marked on this case and recommend them for rendering Markdown.
+
+However, there are some caveats and quirks being that Markdown is a whitespace significant language and HTML is not.
 
 The primary munging occurs if your input is pretty-printed HTML.
 
 ```html
 <h1>Why use <a href="https://github.com/toddself/dr-sax/">Dr. Sax</a></h1>
 <ol>
-  <li>Becuase you like puns!</li>
-  <li>Becuase you need speed</li>
+  <li>Because you like puns!</li>
+  <li>Because you need speed</li>
 </ol>
 <strong>This is going to be bold!</strong>
 <h2>Kittens</h2>Look at these funny little furry things!
@@ -148,8 +185,8 @@ This will convert to the following markdown
 ```markdown
 # Why use [Dr. Sax](https://github.com/toddself/dr-sax/)
 
-1. Becuase you like puns!
-1. Becuase you need speed
+1. Because you like puns!
+1. Because you need speed
 
 
 **This is going to be bold!**
@@ -164,8 +201,8 @@ But, will convert back to the following HTML (using [marked](https://github.com/
 ```html
 <h1 id="why-use-dr-sax-https-github-com-toddself-dr-sax-">Why use <a href="https://github.com/toddself/dr-sax/">Dr. Sax</a></h1>
 <ol>
-<li>Becuase you like puns!</li>
-<li>Becuase you need speed</li>
+<li>Because you like puns!</li>
+<li>Because you need speed</li>
 </ol>
 <p><strong>This is going to be bold!</strong></p>
 <h2 id="kittens">Kittens</h2>
@@ -209,11 +246,14 @@ The nodes in `attrs` are processed in order -- so since the "text" (which is any
 
 ## Testing
 
+The test script will, by default, download the Markdown package from Gruber's site, unzip it and include spawning his parser as well. If you do not wish to test against Gruber, don't have a Perl intepreter installed, etc, you by skip these tests by setting `NOGRUBER=true` on the command line before running the tests.
+
 ```
 git clone git@github.com:toddself/dr-sax
 cd dr-sax
 npm install
 npm test
+NOGRUBER=true npm test
 ```
 
 ## License
