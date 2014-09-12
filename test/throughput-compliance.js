@@ -29,7 +29,7 @@ test('goes into md and back out again', function(t){
 
 	t.notEqual(str, markdown_html, 'Markdown inserts too many <p> tags');
 	t.equal(str.replace(/\n/g, ''), marked_html.replace(/\n/g, ''), 'conforms to marked');
-  t.notEqual(str.replace(/\n/g, ''), stmd_html, 'CommonMark inserts too many <p> tags');
+  t.equal(str.replace(/\n/g, ''), stmd_html, 'CommonMark inserts too many <p> tags');
 
   if(process.env.NOGRUBER === 'true'){
   	t.end();
