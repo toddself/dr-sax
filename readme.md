@@ -8,6 +8,9 @@ Dr. SAX is an HTML to markdown converter that uses a [SAX-based parser](http://g
 
 It presents both a standard (non-streaming) and transform stream interface for converting HTML to markdown.
 
+## Live Demo
+[WYSWYG Editor with markdown export](http://toddself.github.io/presentations/dr-sax/demo)
+
 ## Installing
 
 `npm install --save dr-sax`
