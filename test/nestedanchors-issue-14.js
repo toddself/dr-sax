@@ -9,4 +9,3 @@ test('nested anchor tags should function correctly', function(t){
   t.equal(output, '[**testing**](http://test.com)', 'nesting spliced tags');
   t.end();
 });
-

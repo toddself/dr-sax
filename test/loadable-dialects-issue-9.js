@@ -16,4 +16,3 @@ test('loadable dialects', function(t){
   t.equal(output, 'FOOtestBAR', 'pluggable dialect');
   t.end();
 });
-

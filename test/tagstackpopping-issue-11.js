@@ -9,4 +9,3 @@ test('tag stack pops correctly', function(t){
   t.equal(output, '[**test**](http://test.com)', 'tag stack popping works correctly');
   t.end();
 });
-
