@@ -132,14 +132,13 @@ The test [tests/throughput-compliance.js](throughput-compliance.js) attempts to 
 
 * [Gruber](http://daringfireball.net/projects/markdown)
 * [Marked](https://github.com/chjj/marked)
-* [CommonMark](https://github.com/jgm/stmd) (via [my fork](https://github.com/toddself/stmd) which allows installation via NPM)
+* [CommonMark](https://github.com/jgm/commonmark.js)
 * [Markdown-JS](https://github.com/evilstreak/markdown-js)
 
 Currently Markdown-JS is considered (by me) non-conforming Markdown -> HTML renderers due to its handling of block-level `<iframe>` tags. Its lack of conformance is not due to how Dr. Sax generates its output.  
 
 These are being tracked by:
 * [markdown-js bug 212](https://github.com/evilstreak/markdown-js/issues/212)
-* <span style="text-decoration: line-through">[stmd bug 88](https://github.com/jgm/stmd/issues/88)</span> **resolved**
 
 The issue is pretty simple:
 
