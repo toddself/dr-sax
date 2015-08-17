@@ -8,12 +8,16 @@ var DrSax = require('../');
 var markdown = require('markdown').markdown;
 var marked = require('marked');
 var commonMark = require('commonmark');
+var MarkdownIt = require('markdown-it');
+
 var commonMarkParser = new commonMark.Parser();
 var commonMarkRenderer = new commonMark.HtmlRenderer();
 var markedRenderer = new marked.Renderer();
 markedRenderer.heading = function(text, level){
   return '<h' + level + '>' + text + '</h' + level + '>';
 };
+var markdownitRenderer = new MarkdownIt()
+var markdownitCMKRenderer = new MarkdownIt('commonmark');
 
 // Since HTML output is whitespace agnostic, differences in newlines in HTML output between Marked and STMD are considered irrelevant since renders will render them identically.
 
@@ -26,10 +30,14 @@ test('goes into md and back out again', function(t){
   var commonMark_html = commonMarkRenderer.render(commonMarkParser.parse(md)).replace(/\n/g, '');
   var markdown_html = markdown.toHTML(md).replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
   var marked_html = marked(md, {renderer: markedRenderer});
+  var markdownit_html = markdownitRenderer.render(md).replace(/\n/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+  var markdownitCMK_html = markdownitCMKRenderer.render(md).replace(/\n/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
 
   t.notEqual(str, markdown_html, 'Markdown inserts too many <p> tags');
   t.equal(str.replace(/\n/g, ''), marked_html.replace(/\n/g, ''), 'conforms to marked');
-  t.equal(str.replace(/\n/g, ''), commonMark_html, 'CommonMark inserts too many <p> tags');
+  t.notEqual(str.replace(/\n/g, ''), commonMark_html, 'See https://github.com/jgm/CommonMark/issues/88 and https://github.com/jgm/CommonMark/issues/352');
+  t.notEqual(str.replace(/\n/g, ''), markdownit_html, 'MarkdownIt vanilla inserts too many <p> tags');
+  t.notEqual(str.replace(/\n/g, ''), markdownitCMK_html, 'MarkdownIt commonmark inserts too many <p> tags');
 
   if(process.env.NOGRUBER === 'true'){
     t.end();

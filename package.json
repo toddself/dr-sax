@@ -33,8 +33,9 @@
     "readable-stream": "~1.0.27-1"
   },
   "devDependencies": {
-    "commonmark": "~0.18.1",
+    "commonmark": "~0.21.0",
     "markdown": "~0.5.0",
+    "markdown-it": "~4.4.0",
     "marked": "~0.3.2",
     "tap": "~0.4.9"
   }
